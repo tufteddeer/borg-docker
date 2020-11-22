@@ -1,0 +1,28 @@
+Alpine based docker container that comes with borg and a script to backup docker volumes.
+
+The directories to backup are hardcoded in the backup script at this point.
+
+docker-compose.yml contains an example setup to backup a Nextcloud installation along with its database
+
+== How to
+
+=== Building
+
+
+[source, shell]
+----
+docker build -t borgbackup .
+----
+
+=== Manual backup
+
+This creates a new instance that mounts all volumes from nextcloud_db_1 and _app_1 and runs the backup script.
+
+[source, shell]
+----
+docker run --rm --name borg_instance --volumes-from nextcloud_db_1 --volumes-from nextcloud_app_1 -v ~/backup:/backup -it borgbackup sh -c "BORG_REPO=/backup/borgrepo /etc/periodic/daily/backup"
+----
+
+The BORG_REPO environment variable as well as the container arguments to volumes-from have to be set accordingly. (The script file as well if it is stored in some other place)
+
+If there already is a running instance, `docker exec` might be used as well.
